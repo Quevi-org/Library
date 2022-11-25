@@ -5,7 +5,7 @@ declare interface Directory {
     directories: Directory[]
 }
 
-//copy of DirectoryWithQuestions
+//copy of Directory
 declare interface DirCache extends Directory {}
 
 declare interface Question {
