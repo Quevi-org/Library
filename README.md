@@ -1,12 +1,12 @@
-# QRepeat Library
+# Questin Library
 
-This is the server part, in where people can host their own questions to be accessed by a QRepeat instance
+This is the server part, in where people can host their own questions to be accessed by a Questin instance
 
 ## Installation
 1. Install [node.js](https://nodejs.org/en/) and [Git](https://git-scm.com/)
 2. Fork it
     ```sh
-    git clone https://github.com/QRepeat/Library
+    git clone https://github.com/Questin-js/Library
     ```
 3. Enter the created folder and create an .env file in the root with those contents:
     ```env
