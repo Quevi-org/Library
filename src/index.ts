@@ -3,7 +3,7 @@
 import express from 'express';
 import dotenv from 'dotenv'; dotenv.config();
 import fs from 'fs';
-import { createCache, getCache } from './lib/reader';
+import { createCache, getCache, getQuestion } from './lib/reader';
 import path from 'path';
 import getCachePath from './lib/utils/getCachePath';
 
@@ -12,6 +12,17 @@ const port = process.env.PORT;
 
 app.get('/', (req, res) => {
     res.send('Yes, I am alive');
+});
+
+app.get('/question/*', async (req, res) => {
+    const questionPath = decodeURI(req.path.substring('/question'.length))
+    console.log(req.path)
+    
+    const question = await getQuestion(questionPath)
+    console.log(question)
+    
+    if(question == null) res.status(404).send()
+    else res.json(question);
 });
 
 (async () => {

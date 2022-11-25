@@ -18,7 +18,7 @@ export const transformDirectory = async (dir: directoryTree.DirectoryTree) => {
     let structure: Directory = {
         name: dir.name,
         path: dir.path !== process.env.DATABASE ? path.normalize(dir.path.replace(path.normalize(process.env.DATABASE), "")) : "/",
-        questions: [],
+        questions: {},
         directories: []
     }
 
@@ -26,7 +26,7 @@ export const transformDirectory = async (dir: directoryTree.DirectoryTree) => {
         if (obj.type === "file") {
             console.log(`Added file "${obj.path}" to the cache`)
             let json = JSON.parse(await fs.readFile(obj.path, "utf-8"))
-            structure.questions.push(json)
+            structure.questions[path.basename(obj.name, path.extname(obj.name))] = json
         }
         else structure.directories.push(await transformDirectory(obj))
     }

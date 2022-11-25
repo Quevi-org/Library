@@ -1,7 +1,7 @@
 declare interface Directory {
     name: string
     path: string
-    questions: Question[]
+    questions: {[questionName: string]: Question}
     directories: Directory[]
 }
 
@@ -9,5 +9,11 @@ declare interface Directory {
 declare interface DirCache extends Directory {}
 
 declare interface Question {
-    
+    description: string
+    answers: {
+        [answerIdentifier: string]: {
+            name: string
+            value: boolean
+        }
+    }
 }

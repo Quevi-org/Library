@@ -7,22 +7,21 @@ export {default as getCache} from "./getCache"
 // just tricky js to break for loops inside a function
 const BreakError = {}
 
-export const getDirFromPath = async (navPath: string): Promise<Directory> => {
+export const getDirFromPath = async (navPath: string) => {
     const cache = await getCache()
     if(navPath === "/") return cache
 
     const arrPath = path.normalize(navPath).split("/").filter(a => a)
 
-    let searchResult: Directory = cache
+    let searchResult: Directory | undefined = cache
     for (const folder of arrPath) {
-        try {
-            searchResult.directories.forEach(dir => {
-                if (dir.name === folder) {
-                    searchResult = dir
-                    throw BreakError //break it
-                }
-            })
-        } catch(e) {if(e !== BreakError) throw e}
+        const index = searchResult.directories.findIndex(d => d.name === folder)
+        if(index === -1) {
+            searchResult = undefined
+            break
+        } else {
+            searchResult = searchResult.directories[index]
+        }
     }
 
     return searchResult
@@ -48,5 +47,18 @@ export const getRandomDirectory = (include: string[] | Directory, exclude?: stri
 }
 
 export const getRandomQuestion = (dir: Directory) => {
-    return dir.questions[Math.floor(Math.random() * (dir.questions.length - 1))]
+    return Object.values(dir.questions)[Math.floor(Math.random() * (Object.keys(dir.questions).length - 1))]
+}
+
+export const getQuestion = async (navPath: string) => {
+    const dirPath = path.dirname(path.normalize(navPath))
+    const questionName = path.basename(navPath, path.extname(navPath))
+
+    const dir = await getDirFromPath(dirPath)
+    if(dir == null) return
+    return getQuestionFromDir(dir, questionName)
+}
+
+export const getQuestionFromDir = (dir: Directory, name: string) => {
+    return dir.questions[name]
 }

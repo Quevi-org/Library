@@ -1,13 +1,19 @@
-// Note that all of the tests here uses the same test DB, so you'll have to tweak them
+import path from "path"
+import {getDirFromPath, getCache, getAllDirsFromDir, getRandomDirectory, getRandomQuestion, createCache, getQuestion, getQuestionFromDir} from "./index"
 
-import {getDirFromPath, getCache, getAllDirsFromDir, getRandomDirectory, getRandomQuestion} from "./index"
+// Note that all of the tests here uses the same test DB, so you'll have to tweak them
+let testFolderWithDirectories = "/PAS"
+let testFolderWithQuestions = "/PAS/2/Parte 1 (Língua Inglesa)"
+let testQuestion = "/PAS/2/Parte 1 (Língua Inglesa)/1"
 
 describe("💾 Reader lib", () => {
-    let testFolderWithQuestions = "/PAS/2/Parte 1 (Língua Inglesa)"
-    let testFolderWithDirectories = "/PAS"
-
     describe("Cache checking", () => {
-        it.todo("should create an cache")
+        it("should create an cache", async () => {
+            const response = await createCache()
+
+            expect(response.path).toBe("/")
+            expect(response.directories.find(d => d.path === testFolderWithDirectories)).not.toBeUndefined()
+        })
 
         it("should get the cache", async () => {
             const response = await getCache()
@@ -26,46 +32,60 @@ describe("💾 Reader lib", () => {
         it("should fail with an inexistent directory", async () => {
             const response = await getDirFromPath("/penis")
             
-            expect(response).toBeUndefined
+            expect(response).toBeUndefined()
         })
 
         it("should get all dirs inside a dir", async () => {
-            const response = getAllDirsFromDir(await getDirFromPath(testFolderWithDirectories))
+            const response = getAllDirsFromDir((await getDirFromPath(testFolderWithDirectories))!)
     
             expect(response).toContain(testFolderWithQuestions)
         })
         
-        it.todo("should fail with an path that represents an question")
-        it.todo("should get an specific question")
-        it.todo("should fail with an invalid question")
+        it("should get an specific question from dir", async () => {
+            const response = getQuestionFromDir((await getDirFromPath(path.dirname(testQuestion)))!, path.basename(testQuestion))
+            
+            expect(response).toHaveProperty("description")
+        })
+
+        it("should get an specific question from a path", async () => {
+            const response = await getQuestion(testQuestion)
+            
+            expect(response).toHaveProperty("description")
+        })
+
+        it("should fail with an invalid question", async () => {
+            const response = await getQuestion("/penis")
+            
+            expect(response).toBeUndefined()
+        })
     })
 
     describe("Random checking", () => {
         it("should get an random dir", async () => {
-            const response = getRandomDirectory(getAllDirsFromDir(await getDirFromPath(testFolderWithDirectories)))
+            const response = getRandomDirectory(getAllDirsFromDir((await getDirFromPath(testFolderWithDirectories))!))
             
     
-            expect(getAllDirsFromDir(await getDirFromPath(testFolderWithDirectories))).toContain(response)
+            expect(getAllDirsFromDir((await getDirFromPath(testFolderWithDirectories))!)).toContain(response)
         })
     
         it("should choose a random question from a specific dir", async () => {
-            const dir = await getDirFromPath(testFolderWithQuestions)
+            const dir = (await getDirFromPath(testFolderWithQuestions))!
             const randomQuestion = getRandomQuestion(dir)
     
-            expect(dir.questions).toContain(randomQuestion)
+            expect(Object.values(dir.questions)).toContain(randomQuestion)
         })
     
         it("should choose a random question from everything", async () => {
-            const allDirs = getAllDirsFromDir(await getDirFromPath("/"))
+            const allDirs = getAllDirsFromDir((await getDirFromPath("/"))!)
             const requestDir = async (): Promise<Directory> => {
-                const dir = await getDirFromPath(getRandomDirectory(allDirs))
-                return dir.questions.length === 0 ? requestDir() : dir
+                const dir = (await getDirFromPath(getRandomDirectory(allDirs)))!
+                return Object.keys(dir.questions).length === 0 ? requestDir() : dir
             }
             const randomDir = await requestDir()
             const randomQuestion = getRandomQuestion(randomDir)
     
     
-            expect(randomDir.questions).toContain(randomQuestion)
+            expect(Object.values(randomDir.questions)).toContain(randomQuestion)
         })
     })
 })
