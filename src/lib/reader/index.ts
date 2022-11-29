@@ -28,18 +28,19 @@ export const getDirFromPath = async (navPath: string) => {
 }
 
 export const getAllDirsFromDir = (dir: Directory) => {
+    if (dir == null) return
     let dirs: string[] = []
 
     dir.directories.forEach(dir => {
         dirs.push(dir.path)
-        if(dir.directories.length !== 0) dirs = [...dirs, ...getAllDirsFromDir(dir)]
+        if(dir.directories.length !== 0) dirs = [...dirs, ...getAllDirsFromDir(dir)!]
     })
 
     return dirs
 }
 
 export const getRandomDirectory = (include: string[] | Directory, exclude?: string[]): string => {
-    if(typeof include === 'object' && !Array.isArray(include)) include = getAllDirsFromDir(include as Directory)
+    if(typeof include === 'object' && !Array.isArray(include)) include = getAllDirsFromDir(include as Directory)!
 
     const element = include[Math.floor(Math.random() * (include.length - 1))]
     
@@ -51,6 +52,7 @@ export const getRandomQuestion = (dir: Directory) => {
 }
 
 export const getQuestion = async (navPath: string) => {
+    if (!await isQuestion(navPath)) return undefined
     const dirPath = path.dirname(path.normalize(navPath))
     const questionName = path.basename(navPath, path.extname(navPath))
 
@@ -61,4 +63,16 @@ export const getQuestion = async (navPath: string) => {
 
 export const getQuestionFromDir = (dir: Directory, name: string) => {
     return dir.questions[name]
+}
+
+export const isQuestion = async (navPath: string) => {
+    const normalizedPath = path.normalize(navPath)
+    const questionName = path.basename(navPath)
+    if (await getDirFromPath(normalizedPath) == null) { //check if it is a valid directory
+        const topDir = await getDirFromPath(path.dirname(normalizedPath))
+        if (topDir != null) {
+            if(topDir.questions[questionName] != null) return true
+        }
+    }
+    return false
 }

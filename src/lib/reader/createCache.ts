@@ -24,8 +24,9 @@ export const transformDirectory = async (dir: directoryTree.DirectoryTree) => {
 
     if (dir.children) for (const obj of dir.children) {
         if (obj.type === "file") {
-            console.log(`Added file "${obj.path}" to the cache`)
+            // console.log(`Added file "${obj.path}" to the cache`)
             let json = JSON.parse(await fs.readFile(obj.path, "utf-8"))
+            json.path = path.join(structure.path, path.basename(obj.name, path.extname(obj.name)))
             structure.questions[path.basename(obj.name, path.extname(obj.name))] = json
         }
         else structure.directories.push(await transformDirectory(obj))

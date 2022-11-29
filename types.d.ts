@@ -9,6 +9,7 @@ declare interface Directory {
 declare interface DirCache extends Directory {}
 
 declare interface Question {
+    path?: string
     description: string
     answers: {
         [answerIdentifier: string]: {

@@ -1,9 +1,9 @@
 /// <reference path="../types.d.ts" />
 
-import express from 'express';
+import express, {Request} from 'express';
 import dotenv from 'dotenv'; dotenv.config();
 import fs from 'fs';
-import { createCache, getCache, getQuestion } from './lib/reader';
+import { createCache, getAllDirsFromDir, getCache, getDirFromPath, getQuestion, getRandomDirectory, getRandomQuestion } from './lib/reader';
 import path from 'path';
 import getCachePath from './lib/utils/getCachePath';
 
@@ -16,13 +16,36 @@ app.get('/', (req, res) => {
 
 app.get('/question/*', async (req, res) => {
     const questionPath = decodeURI(req.path.substring('/question'.length))
-    console.log(req.path)
     
     const question = await getQuestion(questionPath)
-    console.log(question)
     
     if(question == null) res.status(404).send()
     else res.json(question);
+});
+
+
+app.get('/random(/*)?', async (req: Request<{}, {}, {exclude: string}>, res) => {
+    //get the dir from path after /*, or fallback to /
+    const dirPath = decodeURI(req.path.substring('/random'.length)) || "/"
+    const dir = await getDirFromPath(dirPath)
+    if (dir == null) {res.sendStatus(404); return}
+
+    //get all dirs from that dir
+    const allDirs = getAllDirsFromDir(dir)
+    if(allDirs == null) {res.status(400).send("Empty folder"); return}
+    allDirs.push(dir.path) //also add itself
+
+    //filter the dirs for only ones with questions
+    const filteredDirs = await Promise
+        .all(allDirs.map(async dpath => await getDirFromPath(dpath)))
+        .then(dirs => dirs.filter(dir => dir != null && Object.keys(dir.questions).length !== 0) as Directory[])
+
+    //get a random question from the dirs with questions
+    const randomQuestion = getRandomQuestion(filteredDirs[Math.floor(Math.random() * filteredDirs.length)])
+
+    //send
+    if(!randomQuestion.hasOwnProperty("answers")) res.sendStatus(500)
+    else res.header("Cache-Control", "no-cache").json(randomQuestion)
 });
 
 (async () => {
