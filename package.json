@@ -7,7 +7,7 @@
         "build": "npx tsc",
         "build-cache": "node extras/createCache",
         "start": "node dist/index.js",
-        "test": "jest --verbose ./src",
+        "test": "jest --verbose --coverage ./src",
         "watch": "concurrently -p \" {name} \" -n \"TSC,Library,Cache,Test\" -c \"bgBlue.bold,bgMagenta.bold,bgRed.bold,bgGreen.bold.black\" \"npx tsc --watch --preserveWatchOutput\" \"nodemon -q dist/index.js\" \"nodemon -q extras/createCache.js\" \"jest --verbose --watchAll ./src\""
     },
     "keywords": [],
