@@ -8,8 +8,9 @@ test("🧪 Env Variables", () => {
     expect(process.env.TEST_QUESTION, "You should include the enviorment variable TEST_QUESTION in the .env file if you want to execute tests").not.toBeUndefined()
 })
 
-describe("📨 API Tests (Requires the API to be avaiable)", () => {
-    let apiURL = `http://localhost:${process.env.PORT}`
+let apiURL = `http://localhost:${process.env.PORT}`
+
+describe("📨 API Tests (Requires the API to be avaiable)", () => { //btw does somebody know how to skip this if the API is down?
 
     // it("avaiability of API", async () => {
     //     // If you're reading this error afer you ran a test, very likely the API is down. You should run the tests while it is on if you want to test the APIs
