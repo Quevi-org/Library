@@ -1,12 +1,12 @@
-# Questin Library
+# Quevi Library
 
-This is the server part, in where people can host their own questions to be accessed by a Questin instance
+This is the server part, in where people can host their own questions to be accessed by a Quevi instance
 
 ## Installation
-1. Install [node.js >18.0.0](https://nodejs.org/en/) and [Git](https://git-scm.com/)
+1. Install [Node.js >18.0.0](https://nodejs.org/en/) and [Git](https://git-scm.com/)
 2. Fork it
     ```sh
-    git clone https://github.com/Questin-js/Library
+    git clone https://github.com/quevi-org/Library
     ```
 3. Enter the created folder and create an .env file in the root with those contents:
     ```env
