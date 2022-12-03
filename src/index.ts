@@ -6,9 +6,12 @@ import fs from 'fs';
 import { createCache, getAllDirsFromDir, getCache, getDirFromPath, getQuestion, getRandomDirectory, getRandomQuestion } from './lib/reader';
 import path from 'path';
 import getCachePath from './lib/utils/getCachePath';
+import cors from "cors"
 
 const app = express();
 const port = process.env.PORT;
+
+app.use(cors())
 
 app.get('/', (req, res) => {
     res.send('Yes, I am alive');
